@@ -63,24 +63,6 @@ function AddJob() {
     return (
         <div className="min-h-screen bg-gray-100">
 
-            {/* Header */}
-            <header className="bg-white shadow-sm">
-                <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-
-                    <h1 className="text-2xl font-bold">
-                        AI Job Tracker
-                    </h1>
-
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="text-gray-600 hover:text-black"
-                    >
-                        Dashboard
-                    </button>
-
-                </div>
-            </header>
-
             {/* Main */}
             <main className="max-w-4xl mx-auto px-6 py-10">
 

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Jobs() {
-  const navigate = useNavigate();
-
   const [jobs, setJobs] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
@@ -93,37 +90,7 @@ function Jobs() {
   const concludedCount = jobs.filter((j) => j[6] === "Concluded").length;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r min-h-screen p-6">
-        <h1 className="text-xl font-bold mb-10">AI Job Tracker</h1>
-
-        <nav className="space-y-3">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100"
-          >
-            🏠 Dashboard
-          </button>
-
-          <button
-            onClick={() => navigate("/add-job")}
-            className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100"
-          >
-            ＋ Add Job
-          </button>
-
-          <button
-            onClick={() => navigate("/login")}
-            className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100"
-          >
-            ⇥ Exit
-          </button>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="min-h-screen bg-gray-50 p-8">
         {/* Heading */}
         <h1 className="text-3xl font-bold mb-8">List of All Jobs</h1>
 
@@ -233,7 +200,6 @@ function Jobs() {
           )}
         </div>
       </main>
-    </div>
   );
 }
 
