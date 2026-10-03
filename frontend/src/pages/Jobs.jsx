@@ -56,6 +56,8 @@ const normalizeStatus = (status) => {
 
   // Handle status update
   const handleStatusChange = async (jobId, newStatus) => {
+    const previousStatus = jobs.find((job) => job[0] === jobId)?.[7];
+
     // 1. Update local state immediately (Optimistic UI update)
     setJobs((prevJobs) =>
       prevJobs.map((job) => {
@@ -70,15 +72,30 @@ const normalizeStatus = (status) => {
 
     // 2. Persist update to Backend API
     try {
-      await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ status: newStatus }),
       });
+
+      if (!response.ok) {
+        throw new Error(`Status update failed with HTTP ${response.status}`);
+      }
     } catch (error) {
       console.error("Error updating status:", error);
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => {
+          if (job[0] !== jobId) {
+            return job;
+          }
+
+          const revertedJob = [...job];
+          revertedJob[7] = previousStatus;
+          return revertedJob;
+        })
+      );
     }
   };
 

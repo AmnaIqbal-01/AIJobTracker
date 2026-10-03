@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from fastapi import UploadFile, File
+from fastapi import UploadFile, File, HTTPException
 import pytesseract
 from PIL import Image
 import ollama
@@ -28,6 +28,10 @@ app.add_middleware(
 class LoginRequest(BaseModel):
     email: str
     password: str
+
+
+class JobStatusUpdate(BaseModel):
+    status: str
 
 
 @app.post("/api/login")
@@ -100,6 +104,24 @@ def get_jobs():
         "success": True,
         "jobs": jobs
     }
+
+
+@app.patch("/api/jobs/{job_id}")
+def update_job_status(job_id: int, data: JobStatusUpdate):
+    connection = sqlite3.connect("jobs.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE jobs SET status = ? WHERE id = ?",
+            (data.status, job_id),
+        )
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Job not found")
+        connection.commit()
+    finally:
+        connection.close()
+
+    return {"success": True, "message": "Job status updated"}
 
 
 def extract_job_data(text):
