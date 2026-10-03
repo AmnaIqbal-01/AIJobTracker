@@ -44,6 +44,7 @@ const normalizeStatus = (status) => {
 };
 
   useEffect(() => {
+    // Local API URL for development; replace it with the deployed backend URL when publishing.
     fetch("http://127.0.0.1:8000/api/jobs")
       .then((response) => response.json())
       .then((data) => {
@@ -72,6 +73,7 @@ const normalizeStatus = (status) => {
 
     // 2. Persist update to Backend API
     try {
+      // Local API URL for development; replace it with the deployed backend URL when publishing.
       const response = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}`, {
         method: "PATCH",
         headers: {

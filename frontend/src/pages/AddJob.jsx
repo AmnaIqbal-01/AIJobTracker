@@ -45,6 +45,7 @@ function AddJob() {
 
         const formData = new FormData();
         formData.append("screenshot", screenshot);
+      // Local API URL for development; replace it with the deployed backend URL when publishing.
 
         try {
             const response = await fetch(
