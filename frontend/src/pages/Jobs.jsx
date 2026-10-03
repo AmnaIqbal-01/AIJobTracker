@@ -6,22 +6,42 @@ function Jobs() {
   const [filter, setFilter] = useState("All");
 
   // Status badge styling helper
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case "In Progress":
-      case "Applied":
-        return "bg-blue-100 text-blue-700 border-blue-200";
-      case "Interview":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
-      case "Offer":
-      case "Concluded":
-        return "bg-green-100 text-green-700 border-green-200";
-      case "Rejected":
-        return "bg-red-100 text-red-700 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
-    }
-  };
+const getStatusBadgeClass = (status) => {
+  switch (status) {
+    case "Applied":
+      return "bg-blue-50 text-blue-700 border-blue-200";
+
+    case "In Progress":
+      return "bg-purple-50 text-purple-700 border-purple-200";
+
+    case "Interview":
+      return "bg-yellow-50 text-yellow-700 border-yellow-200";
+
+    case "Offer":
+      return "bg-green-50 text-green-700 border-green-200";
+
+    case "Rejected":
+      return "bg-red-50 text-red-700 border-red-200";
+
+    case "Concluded":
+      return "bg-gray-50 text-gray-700 border-gray-300";
+
+    default:
+      return "bg-gray-50 text-gray-700 border-gray-200";
+  }
+};
+
+const normalizeStatus = (status) => {
+  const normalizedStatus = String(status || "Applied").toLowerCase();
+  return {
+    applied: "Applied",
+    "in progress": "In Progress",
+    interview: "Interview",
+    offer: "Offer",
+    rejected: "Rejected",
+    concluded: "Concluded",
+  }[normalizedStatus] || "Applied";
+};
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/jobs")
@@ -41,7 +61,7 @@ function Jobs() {
       prevJobs.map((job) => {
         if (job[0] === jobId) {
           const updatedJob = [...job];
-          updatedJob[6] = newStatus; // Assuming index 6 holds the status value
+          updatedJob[7] = newStatus;
           return updatedJob;
         }
         return job;
@@ -67,7 +87,7 @@ function Jobs() {
     const company = job[1] || "";
     const position = job[2] || "";
     const location = job[3] || "";
-    const status = job[6] || "Applied";
+    const status = normalizeStatus(job[7]);
 
     const searchText = search.toLowerCase();
 
@@ -84,10 +104,10 @@ function Jobs() {
   // Calculate stats dynamically
   const totalJobs = jobs.length;
   const inProgressCount = jobs.filter(
-    (j) => (j[6] || "Applied") === "In Progress" || (j[6] || "Applied") === "Applied"
+    (job) => ["In Progress", "Applied"].includes(normalizeStatus(job[7]))
   ).length;
-  const rejectedCount = jobs.filter((j) => j[6] === "Rejected").length;
-  const concludedCount = jobs.filter((j) => j[6] === "Concluded").length;
+  const rejectedCount = jobs.filter((job) => normalizeStatus(job[7]) === "Rejected").length;
+  const concludedCount = jobs.filter((job) => normalizeStatus(job[7]) === "Concluded").length;
 
   return (
       <main className="min-h-screen bg-gray-50 p-8">
@@ -161,7 +181,7 @@ function Jobs() {
 
             <tbody>
               {filteredJobs.map((job) => {
-                const currentStatus = job[6] || "Applied";
+                const currentStatus = normalizeStatus(job[7]);
 
                 return (
                   <tr key={job[0]} className="border-b hover:bg-gray-50">
@@ -177,9 +197,9 @@ function Jobs() {
                         onChange={(e) =>
                           handleStatusChange(job[0], e.target.value)
                         }
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium border cursor-pointer outline-none transition-colors ${getStatusBadgeClass(
-                          currentStatus
-                        )}`}
+                       className={`px-3 py-2 rounded-lg text-sm font-medium border cursor-pointer outline-none transition-colors ${getStatusBadgeClass(
+  currentStatus
+)}`}
                       >
                         <option value="Applied">Applied</option>
                         <option value="In Progress">In Progress</option>
