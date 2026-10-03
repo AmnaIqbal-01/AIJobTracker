@@ -1,16 +1,38 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+        setLoading(true);
 
-        console.log({
-            email,
-            password,
-        });
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                setError(data.message || "Invalid email or password.");
+                return;
+            }
+
+            sessionStorage.removeItem("ai-job-tracker-logged-out");
+            navigate("/dashboard", { replace: true });
+        } catch {
+            setError("Could not connect to the server. Make sure the backend is running.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -30,6 +52,7 @@ export default function Login() {
 
                         <input
                             type="email"
+                            required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full border rounded-md p-3"
@@ -44,6 +67,7 @@ export default function Login() {
 
                         <input
                             type="password"
+                            required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full border rounded-md p-3"
@@ -53,10 +77,17 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700"
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
                     >
-                        Login
+                        {loading ? "Logging in..." : "Login"}
                     </button>
+
+                    {error && (
+                        <p role="alert" className="mt-4 text-sm text-red-600">
+                            {error}
+                        </p>
+                    )}
 
                 </form>
             </div>

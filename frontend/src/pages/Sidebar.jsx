@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Sidebar() {
+export default function Sidebar({ onLogout }) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -14,7 +14,7 @@ export default function Sidebar() {
     return (
         <aside className="w-64 bg-white border-r border-gray-200 min-h-screen p-6 flex flex-col justify-between shrink-0">
             <div>
-                <h1 className="text-xl font-bold mb-10 text-black">
+                <h1 className="text-xl font-bold mb-10 text-black cursor-default select-none">
                     AI Job Tracker
                 </h1>
 
@@ -24,7 +24,12 @@ export default function Sidebar() {
                         return (
                             <button
                                 key={item.label}
-                                onClick={() => navigate(item.path)}
+                                onClick={() => {
+                                    if (item.path === "/login") {
+                                        onLogout();
+                                    }
+                                    navigate(item.path, { replace: item.path === "/login" });
+                                }}
                                 className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left font-medium transition-colors ${
                                     isActive
                                         ? "bg-gray-100 text-black font-semibold"

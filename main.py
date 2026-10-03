@@ -90,7 +90,7 @@ def get_jobs():
     connection = sqlite3.connect("jobs.db")
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM jobs")
+    cursor.execute("SELECT * FROM jobs ORDER BY id DESC")
 
     jobs = cursor.fetchall()
 
@@ -110,30 +110,61 @@ def extract_job_data(text):
             {
                 "role": "user",
                 "content": f"""
-Extract job information from the following job posting text.
+Extract job information from this job posting.
 
-Return ONLY valid JSON with these fields:
+Return ONLY a valid JSON object.
+Do not write any explanation.
+Do not use markdown.
+Do not use ```json.
+Do not write anything before or after the JSON.
 
-company
-position
-location
-job_type
-salary
-skills
+Use exactly these fields:
 
-If information is not available, use null.
+{{
+    "company": null,
+    "position": null,
+    "location": null,
+    "job_type": null,
+    "salary": null,
+    "skills": null
+}}
 
-For skills, return a JSON array.
+Rules:
+1. NEVER guess or invent information.
+2. Only extract information that is clearly present in the job posting.
+3. If information is missing or unclear, use null.
+4. For salary:
+   - Only include a salary if an actual salary amount or salary range is clearly written.
+   - Do NOT interpret random numbers, IDs, dates, experience requirements, or OCR errors as salary.
+   - If there is no clearly stated salary, return null.
+   - only pick values which are clearly stated as salary in the posting. Do not make assumptions or guesses.
+   - only pick values which have currency sign with them
+   
+5. For company:
+   - Only use a company name if it is clearly identifiable.
+   - Do not use a job title as the company.
+6. For location:
+   - Only use a location explicitly mentioned in the posting.
+7. For job_type:
+   - Only use values such as Full-time, Part-time, Contract, Internship, etc. when clearly stated.
+8. For skills:
+   - Only include technologies, programming languages, frameworks, tools, or clearly stated professional skills.
+   - Do not include random words from the posting.
+9. Do not make assumptions.
+10. Do not add explanations or markdown.
 
-Job posting text:
-
+Job posting:
 {text}
 """
             }
-        ]
+        ],
+        format ="json"
     )
 
     result = response["message"]["content"]
+    print("Ollama response::")
+    print(result)
+    print("End of Ollama response::")
 
     return json.loads(result)
 

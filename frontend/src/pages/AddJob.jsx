@@ -2,6 +2,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const formatSkills = (skills) => {
+    if (Array.isArray(skills)) {
+        return skills.filter(Boolean).join(", ") || "Not found";
+    }
+
+    if (typeof skills === "string" && skills.trim()) {
+        return skills;
+    }
+
+    return "Not found";
+};
+
 function AddJob() {
     const navigate = useNavigate();
 
@@ -171,7 +183,7 @@ function AddJob() {
                                     Skills
                                 </p>
                                 <p className="font-medium">
-                                    {jobData.skills?.join(", ") || "Not found"}
+                                    {formatSkills(jobData.skills)}
                                 </p>
                             </div>
 
