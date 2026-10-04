@@ -1,7 +1,8 @@
 import ollama
+from settings import LLM_MODEL
 
 response = ollama.chat(
-    model="llama3.2:3b",
+    model=LLM_MODEL,
     messages=[
         {
             "role": "user",

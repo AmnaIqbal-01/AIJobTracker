@@ -1,0 +1,9 @@
+.env
+__pycache__/
+env/
+venv/
+*.db
+
+# custom ignores
+evaluation_dataset/
+test_accuracy.py
