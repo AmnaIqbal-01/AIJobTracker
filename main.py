@@ -7,6 +7,7 @@ from PIL import Image
 import ollama
 import sqlite3
 import json
+from settings import LLM_MODEL
 
 
 app = FastAPI()
@@ -127,7 +128,7 @@ def update_job_status(job_id: int, data: JobStatusUpdate):
 def extract_job_data(text):
 
     response = ollama.chat(
-        model="llama3.2:3b",
+        model=LLM_MODEL,
         messages=[
             {
                 "role": "user",
